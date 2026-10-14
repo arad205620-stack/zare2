@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مقایسه‌گر قیمت | خرید هوشمندانه</title>
+
+  <style>
+    /* تنظیمات کلی صفحه */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1e293b;
+      line-height: 1.8;
+    }
+
+    .container {
+      width: min(920px, 92%);
+      margin: 0 auto;
+    }
+
+    /* سربرگ */
+    header {
+      background: linear-gradient(135deg, #155eef, #6941c6);
+      color: white;
+      padding: 35px 0;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 5vw, 34px);
+    }
+
+    header p {
+      margin: 0;
+      color: #e0eaff;
+      font-size: 14px;
+    }
+
+    main {
+      padding: 28px 0 40px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .intro h2 {
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .intro p {
+      margin-top: 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    /* کارت‌های محصولات */
+    .products {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .product-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .product-card h3 {
+      margin: 0 0 18px;
+      font-size: 18px;
+    }
+
+    .product-card:first-child h3 {
+      color: #155eef;
+    }
+
+    .product-card:last-child h3 {
+      color: #7c3aed;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: #1e293b;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #155eef;
+      box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.12);
+    }
+
+    .hint {
+      display: block;
+      margin-top: 5px;
+      color: #64748b;
+      font-size: 11px;
+    }
+
+    /* دکمه محاسبه */
+    .action {
+      margin-top: 22px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      max-width: 360px;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      background: #155eef;
+      color: white;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #1248c5;
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #93c5fd;
+      outline-offset: 3px;
+    }
+
+    /* بخش نتیجه */
+    .result {
+      display: none;
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .result-item {
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .result-item span {
+      display: block;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .result-item strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .winner {
+      padding: 14px;
+      border-radius: 12px;
+      background: #ecfdf3;
+      color: #067647;
+      font-weight: bold;
+    }
+
+    .tie {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .error {
+      margin-top: 16px;
+      color: #b42318;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    /* نمایش مناسب در موبایل */
+    @media (max-width: 600px) {
+      header {
+        padding: 27px 12px;
+      }
+
+      .products {
+        grid-template-columns: 1fr;
+      }
+
+      .product-card {
+        padding: 18px;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <h1>🛒 مقایسه‌گر هوشمند قیمت</h1>
+      <p>بیشتر خریدن همیشه به معنی ارزان‌تر خریدن نیست!</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h2>کدام محصول به‌صرفه‌تر است؟</h2>
+      <p>
+        قیمت و مقدار دو محصول را وارد کن تا هزینهٔ هر واحد را مقایسه کنیم.
+      </p>
+    </section>
+
+    <form id="compareForm">
+      <div class="products">
+
+        <!-- اطلاعات محصول اول -->
+        <section class="product-card">
+          <h3>🔵 محصول اول</h3>
+
+          <div class="field">
+            <label for="name1">نام محصول</label>
+            <input
+              id="name1"
+              type="text"
+              placeholder="مثلاً برنج معمولی"
+              value="محصول اول"
+              maxlength="60"
+            >
+          </div>
+
+          <div class="field">
+            <label for="price1">قیمت (تومان)</label>
+            <input
+              id="price1"
+              type="number"
+              min="0.01"
+              step="any"
+              placeholder="مثلاً 90000"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="amount1">مقدار محصول</label>
+            <input
+              id="amount1"
+              type="number"
+              min="0.01"
+              step="any"
+              placeholder="مثلاً 500"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="unit1">واحد اندازه‌گیری</label>
+            <select id="unit1">
+              <option value="g">گرم</option>
+              <option value="kg">کیلوگرم</option>
+              <option value="ml">میلی‌لیتر</option>
+              <option value="l">لیتر</option>
+              <option value="count">عدد</option>
+            </select>
+            <small class="hint">
+              برای مقایسهٔ منصفانه، واحد دو محصول باید یکسان باشد.
+            </small>
+          </div>
+        </section>
+
+        <!-- اطلاعات محصول دوم -->
+        <section class="product-card">
+          <h3>🟣 محصول دوم</h3>
+
+          <div class="field">
+            <label for="name2">نام محصول</label>
+            <input
+              id="name2"
+              type="text"
+              placeholder="مثلاً برنج خانوادگی"
+              value="محصول دوم"
+              maxlength="60"
+            >
+          </div>
+
+          <div class="field">
+            <label for="price2">قیمت (تومان)</label>
+            <input
+              id="price2"
+              type="number"
+              min="0.01"
+              step="any"
+              placeholder="مثلاً 150000"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="amount2">مقدار محصول</label>
+            <input
+              id="amount2"
+              type="number"
+              min="0.01"
+              step="any"
+              placeholder="مثلاً 1000"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="unit2">واحد اندازه‌گیری</label>
+            <select id="unit2">
+              <option value="g">گرم</option>
+              <option value="kg">کیلوگرم</option>
+              <option value="ml">میلی‌لیتر</option>
+              <option value="l">لیتر</option>
+              <option value="count">عدد</option>
+            </select>
+            <small class="hint">
+              برای مایعات از میلی‌لیتر یا لیتر استفاده کن.
+            </small>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="action">
+        <button type="submit">مقایسهٔ قیمت‌ها</button>
+      </div>
+
+      <p id="errorMessage" class="error" role="alert"></p>
+    </form>
+
+    <!-- نتیجهٔ مقایسه با JavaScript نمایش داده می‌شود -->
+    <section id="result" class="result" aria-live="polite">
+      <h2>📊 نتیجهٔ مقایسه</h2>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <span id="label1">قیمت واحد محصول اول</span>
+          <strong id="unitPrice1">—</strong>
+        </div>
+
+        <div class="result-item">
+          <span id="label2">قیمت واحد محصول دوم</span>
+          <strong id="unitPrice2">—</strong>
+        </div>
+      </div>
+
+      <div id="winner" class="winner"></div>
+      <p id="explanation" class="note"></p>
+    </section>
+
+    <p class="note">
+      نکته: این ابزار قیمت را بر اساس مقدار مقایسه می‌کند؛
+      کیفیت، تاریخ انقضا و سایر ویژگی‌های محصولات را بررسی نمی‌کند.
+    </p>
+  </main>
+
+  <footer>
+    ساخته‌شده برای خرید آگاهانه‌تر 💙
+  </footer>
+
+  <script>
+    // پیدا کردن عناصر موردنیاز صفحه
+    const form = document.getElementById("compareForm");
+    const result = document.getElementById("result");
+    const errorMessage = document.getElementById("errorMessage");
+
+    // تبدیل مقدارها به واحد پایه
+    // وزن: گرم | حجم: میلی‌لیتر | تعداد: عدد
+    function normalizeAmount(amount, unit) {
+      if (unit === "kg") return amount * 1000;
+      if (unit === "l") return amount * 1000;
+      return amount;
+    }
+
+    // نام واحد پایه برای نمایش قیمت
+    function getBaseUnit(unit) {
+      if (unit === "g" || unit === "kg") return "گرم";
+      if (unit === "ml" || unit === "l") return "میلی‌لیتر";
+      return "عدد";
+    }
+
+    // نمایش عددها با جداکنندهٔ هزارگان فارسی
+    function formatNumber(number) {
+      return new Intl.NumberFormat("fa-IR", {
+        maximumFractionDigits: 4
+      }).format(number);
+    }
+
+    // مقایسه پس از فشردن دکمه
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      errorMessage.textContent = "";
+      result.classList.remove("show");
+
+      const name1 =
+        document.getElementById("name1").value.trim() || "محصول اول";
+      const name2 =
+        document.getElementById("name2").value.trim() || "محصول دوم";
+
+      const price1 = Number(document.getElementById("price1").value);
+      const price2 = Number(document.getElementById("price2").value);
+
+      const amount1 = Number(document.getElementById("amount1").value);
+      const amount2 = Number(document.getElementById("amount2").value);
+
+      const unit1 = document.getElementById("unit1").value;
+      const unit2 = document.getElementById("unit2").value;
+
+      // بررسی درست بودن ورودی‌ها
+      if (
+        !Number.isFinite(price1) ||
+        !Number.isFinite(price2) ||
+        !Number.isFinite(amount1) ||
+        !Number.isFinite(amount2) ||
+        price1 <= 0 ||
+        price2 <= 0 ||
+        amount1 <= 0 ||
+        amount2 <= 0
+      ) {
+        errorMessage.textContent =
+          "لطفاً قیمت و مقدار هر دو محصول را به‌درستی و بیشتر از صفر وارد کن.";
+        return;
+      }
+
+      // بررسی سازگاری واحدها
+      const isWeight1 = unit1 === "g" || unit1 === "kg";
+      const isWeight2 = unit2 === "g" || unit2 === "kg";
+
+      const isVolume1 = unit1 === "ml" || unit1 === "l";
+      const isVolume2 = unit2 === "ml" || unit2 === "l";
+
+      const compatible =
+        (isWeight1 && isWeight2) ||
+        (isVolume1 && isVolume2) ||
+        (unit1 === "count" && unit2 === "count");
+
+      if (!compatible) {
+        errorMessage.textContent =
+          "واحد دو محصول با هم سازگار نیست. مثلاً وزن را با وزن یا حجم را با حجم مقایسه کن.";
+        return;
+      }
+
+      // تبدیل مقدارها به واحد پایه
+      const normalizedAmount1 = normalizeAmount(amount1, unit1);
+      const normalizedAmount2 = normalizeAmount(amount2, unit2);
+
+      // محاسبهٔ قیمت هر واحد
+      const unitPrice1 = price1 / normalizedAmount1;
+      const unitPrice2 = price2 / normalizedAmount2;
+
+      const baseUnit = getBaseUnit(unit1);
+
+      // نمایش قیمت هر واحد
+      document.getElementById("label1").textContent =
+        "قیمت هر " + baseUnit + " از " + name1;
+
+      document.getElementById("label2").textContent =
+        "قیمت هر " + baseUnit + " از " + name2;
+
+      document.getElementById("unitPrice1").textContent =
+        formatNumber(unitPrice1) + " تومان";
+
+      document.getElementById("unitPrice2").textContent =
+        formatNumber(unitPrice2) + " تومان";
+
+      const winner = document.getElementById("winner");
+      const explanation = document.getElementById("explanation");
+
+      // تعیین محصول به‌صرفه‌تر
+      if (Math.abs(unitPrice1 - unitPrice2) < 1e-10) {
+        winner.textContent = "⚖️ هر دو محصول قیمت واحد یکسانی دارند.";
+        winner.className = "winner tie";
+        explanation.textContent =
+          "از نظر قیمت نسبت به مقدار، هیچ‌کدام ارزان‌تر نیستند.";
+      } else {
+        const cheaperName =
+          unitPrice1 < unitPrice2 ? name1 : name2;
+
+        const moreExpensivePrice =
+          Math.max(unitPrice1, unitPrice2);
+
+        const cheaperPrice =
+          Math.min(unitPrice1, unitPrice2);
+
+        const savingPercent =
+          ((moreExpensivePrice - cheaperPrice) /
+            moreExpensivePrice) * 100;
+
+        winner.textContent =
+          "✅ " + cheaperName + " از نظر قیمت واحد به‌صرفه‌تر است.";
+
+        winner.className = "winner";
+
+        explanation.textContent =
+          "قیمت هر واحد این محصول حدود " +
+          formatNumber(savingPercent) +
+          "٪ کمتر از گزینهٔ دیگر است.";
+      }
+
+      result.classList.add("show");
+      result.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    });
+
+    // با تغییر اطلاعات، نتیجهٔ قبلی دیگر نمایش داده نشود
+    form.addEventListener("input", function() {
+      result.classList.remove("show");
+      errorMessage.textContent = "";
+    });
+  </script>
+</body>
+</html>
